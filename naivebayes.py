@@ -114,7 +114,8 @@ class NaiveBayes:
                 if label == 'spam':
                     spamCorCnt += 1
                     recallCorCnt += 1
-            print(float(totalCnt) / float(len(testSet)) * 100)
+            if totalCnt % 100 == 0:
+                print(float(totalCnt) / float(len(testSet)) * 100)
 
         accuracy = float(correctCnt) / float(totalCnt)
         precision = float(spamCorCnt) / float(spamCnt)
