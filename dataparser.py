@@ -2,6 +2,7 @@ import os
 import random
 
 dirPath = 'D:/trec06c-utf8_692204712/trec06c-utf8'
+folds = 5
 
 
 def readLabels():
@@ -15,7 +16,6 @@ def readLabels():
     return labels
 
 
-# 5-fold cross validation
 def divideSets():
     labels = readLabels()
     trainSet = []
@@ -27,7 +27,7 @@ def divideSets():
         for file in files:
             relativePath = '../data/' + dir + '/' + file
             # print(relativePath)
-            if random.random() > 0.9:
+            if random.random() > 1:
                 testSet.append(relativePath + ' ' + labels[relativePath + '\n'] + '\n')
             else:
                 trainSet.append(relativePath + ' ' + labels[relativePath + '\n'] + '\n')
@@ -50,6 +50,24 @@ def readSets(fileName):
     return data
 
 
+# 5-fold cross validation
+def crossValidation(folds):
+    trainData = readSets('trainSet.data')
+    crossData = []
+    for i in range(folds):
+        crossData.append([])
+    for data in trainData:
+        temp = random.randint(1, 5)
+        crossData[temp % 5].append(data[0] + ' ' + data[1] + '\n')
+
+    for i in range(folds):
+        trainFile = open(dirPath + '/trainSet' + str(i) + '.data', 'w')
+        trainFile.writelines(crossData[i])
+
+    print('Cross Valid Done')
+
+
 if __name__ == '__main__':
     # print(readSets('testSet.data'))
     divideSets()
+    crossValidation(folds)
