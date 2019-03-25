@@ -25,12 +25,12 @@ def divideSets():
     for dir in fileDirs:
         files = os.listdir(dirPath + '/data_cut/' + dir)
         for file in files:
-            relativePath = '../data/' + dir + '/' + file + '\n'
+            relativePath = '../data/' + dir + '/' + file
             # print(relativePath)
             if random.random() > 0.9:
-                testSet.append(relativePath + ' ' + labels[relativePath] + '\n')
+                testSet.append(relativePath + ' ' + labels[relativePath + '\n'] + '\n')
             else:
-                trainSet.append(relativePath + ' ' + labels[relativePath] + '\n')
+                trainSet.append(relativePath + ' ' + labels[relativePath + '\n'] + '\n')
 
     # write sets
     trainFile = open(dirPath + '/trainSet.data', 'w')
@@ -40,5 +40,16 @@ def divideSets():
     print('Divide Done')
 
 
+def readSets(fileName):
+    file = open(dirPath + '/' + fileName)
+    lines = file.readlines()
+    data = []
+    for line in lines:
+        line = line.split('\n')[0]
+        data.append((line.split(' ')[0], line.split(' ')[1]))
+    return data
+
+
 if __name__ == '__main__':
+    # print(readSets('testSet.data'))
     divideSets()
