@@ -9,14 +9,19 @@ class NaiveBayes:
     trainSize = 1
     features = {'ham': {}, 'spam': {}}
     probs = {'ham': 0, 'spam': 0}
+    totalNum = 0
 
     def calcPro(self):
         # calculate probility -- y
         trainData = dataparser.readSets('trainSet.data')
+        cnt = 0
         for data in trainData:
+            cnt += 1
             if random.random() > self.trainSize:
                 continue
 
+            if cnt % 1000 == 0:
+                print(cnt)
             emailPath = data[0]
             label = data[1]
             # emailPath: '../data/xxx/xxx'
@@ -42,19 +47,62 @@ class NaiveBayes:
             self.probs['spam'] += i
         for i in self.features['ham'].values():
             self.probs['ham'] += i
-        file = open(dataparser.dirPath + 'probs', 'w', encoding='utf-8')
+        file = open(dataparser.dirPath + '/probs.data', 'w', encoding='utf-8')
         json.dump(self.probs, file, indent=4)
         print("Probs Done")
 
-        file = open(dataparser.dirPath + 'features', 'w', encoding='utf-8')
+        file = open(dataparser.dirPath + '/features.data', 'w', encoding='utf-8')
         json.dump(self.features, file, ensure_ascii=False, indent=4)
         print("Features Done")
 
-
-    # def classify(self):
+    def classify(self):
         # classify emails
+        correctCnt = 0
+        totalCnt = 0
+        testSet = dataparser.readSets('testSet.data')
+        probsFile = open(dataparser.dirPath + '/probs.data')
+        probs = json.load(probsFile)
+        featuresFile = open(dataparser.dirPath + '/features.data', encoding='utf-8')
+        features = json.load(featuresFile)
+        for num in probs.values():
+            self.totalNum += num
+        for data in testSet:
+            result = ''
+            hamProb = float(probs['ham']) / float(self.totalNum)
+            spamProb = float(probs['spam']) / float(self.totalNum)
+            emailPath = data[0]
+            label = data[1]
+            email = open(dataparser.dirPath + '/data_cut/' + emailPath[8:], encoding='utf-8')
+            content = email.read()
+            pattern = '[\u4e00-\u9fa5]'
+            characters = re.findall(re.compile(pattern), content)
+            temp = 'ham'
+            for character in characters:
+                # print(features[temp].keys())
+                if character in features[temp].keys():
+                    hamProb *= float(features[temp][character]) / float(probs[temp])
+            temp = 'spam'
+            for character in characters:
+                # print(features[temp].keys())
+                if character in features[temp].keys():
+                    spamProb *= float(features[temp][character]) / float(probs[temp])
+
+            if spamProb > hamProb:
+                result = 'spam'
+            else:
+                result = 'ham'
+            totalCnt += 1
+            if result == label:
+                correctCnt += 1
+            # print(float(correctCnt) / float(totalCnt))
+
+        accuracy = float(correctCnt) / float(totalCnt)
+        print('Correct: ', correctCnt)
+        print('Total: ', totalCnt)
+        print('Accuracy: ', accuracy)
 
 
 if __name__ == '__main__':
     classifier = NaiveBayes()
-    classifier.calcPro()
+    # classifier.calcPro()
+    classifier.classify()
