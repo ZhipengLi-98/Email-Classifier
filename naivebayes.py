@@ -2,6 +2,7 @@ import dataparser
 import random
 import re
 import json
+import math
 
 
 class NaiveBayes:
@@ -61,7 +62,7 @@ class NaiveBayes:
         json.dump(self.features, file, ensure_ascii=False, indent=4)
         print("Features Done")
 
-        print('Calc Fold ' + str(i) + ' Done')
+        print('Calc Fold ' + str(fold) + ' Done')
 
     def classify(self, fold):
         print('Classify Fold ' + str(fold) + ' Start')
@@ -82,8 +83,8 @@ class NaiveBayes:
             totalNum += num
         for data in testSet:
             result = ''
-            hamProb = float(probs['ham']) / float(totalNum)
-            spamProb = float(probs['spam']) / float(totalNum)
+            hamProb = math.log(float(probs['ham']) / float(totalNum))
+            spamProb = math.log(float(probs['spam']) / float(totalNum))
             emailPath = data[0]
             label = data[1]
             email = open(dataparser.dirPath + '/data_cut/' + emailPath[8:], encoding='utf-8')
@@ -94,12 +95,12 @@ class NaiveBayes:
             for character in characters:
                 # print(features[temp].keys())
                 if character in features[temp].keys():
-                    hamProb *= float(features[temp][character]) / float(probs[temp])
+                    hamProb += math.log(float(features[temp][character]) / float(probs[temp]))
             temp = 'spam'
             for character in characters:
                 # print(features[temp].keys())
                 if character in features[temp].keys():
-                    spamProb *= float(features[temp][character]) / float(probs[temp])
+                    spamProb += math.log(float(features[temp][character]) / float(probs[temp]))
 
             if spamProb > hamProb:
                 result = 'spam'
