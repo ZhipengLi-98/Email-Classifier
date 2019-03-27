@@ -36,14 +36,28 @@ class NaiveBayes:
             email = open(dataparser.dirPath + '/data_cut/' + emailPath[8:], encoding='utf-8')
 
             # using email content to classify
-            # nothing else by now
-            # issue 3 relative?
             content = email.read()
 
             # [\u4e00-\u9fa5]
-            # 单个字符 是不是使用分词结果更好一些？
             pattern = '[\u4e00-\u9fa5]+'
             characters = re.findall(re.compile(pattern), content)
+
+            pattern = 'From.*@.*'
+            fromFeat = re.findall(re.compile(pattern), content)
+            if not len(fromFeat) == 0:
+                sender = fromFeat[0].split("@")[-1].split(">")[0].split(" ")[0]
+                characters.append(sender)
+
+            pattern = 'http'
+            url = re.findall(re.compile(pattern), content)
+            characters += url
+
+            pattern = 'X-Mailer: .*'
+            mailer = re.findall(re.compile(pattern), content)
+            if not len(mailer) == 0:
+                xmailer = mailer[0].split(":")[1].split(" ")[1]
+                characters += xmailer
+
             for character in characters:
                 if character in self.features[label].keys():
                     self.features[label][character] += 1
@@ -75,10 +89,17 @@ class NaiveBayes:
         recallCorCnt = 0
         totalNum = 0
         testSet = dataparser.readSets('trainSet' + str(fold) + '.data')
-        probsFile = open(dataparser.dirPath + '/probs' + str(fold) + '.data')
-        probs = json.load(probsFile)
-        featuresFile = open(dataparser.dirPath + '/features' + str(fold) + '.data', encoding='utf-8')
-        features = json.load(featuresFile)
+        # testSet = dataparser.readSets('testSet.data')
+        probs = {}
+        features = {}
+        for i in range(0, dataparser.folds):
+            if not i == fold:
+                probsFile = open(dataparser.dirPath + '/probs' + str(i) + '.data')
+                probs.update(json.load(probsFile))
+        for i in range(0, dataparser.folds):
+            if not i == fold:
+                featuresFile = open(dataparser.dirPath + '/features' + str(i) + '.data', encoding='utf-8')
+                features.update(json.load(featuresFile))
         for num in probs.values():
             totalNum += num
         for data in testSet:
@@ -89,8 +110,24 @@ class NaiveBayes:
             label = data[1]
             email = open(dataparser.dirPath + '/data_cut/' + emailPath[8:], encoding='utf-8')
             content = email.read()
+
             pattern = '[\u4e00-\u9fa5]+'
             characters = re.findall(re.compile(pattern), content)
+            pattern = 'From.*@.*'
+            fromFeat = re.findall(re.compile(pattern), content)
+            if not len(fromFeat) == 0:
+                sender = fromFeat[0].split("@")[-1].split(">")[0].split(" ")[0]
+                characters.append(sender)
+            pattern = 'http'
+            url = re.findall(re.compile(pattern), content)
+            characters += url
+
+            pattern = 'X-Mailer: .*'
+            mailer = re.findall(re.compile(pattern), content)
+            if not len(mailer) == 0:
+                xmailer = mailer[0].split(":")[1].split(" ")[1]
+                characters += xmailer
+
             temp = 'ham'
             for character in characters:
                 # print(features[temp].keys())
@@ -137,7 +174,8 @@ class NaiveBayes:
         results = []
         for i in range(dataparser.folds):
             # trainSeti.data as vertification set
-            results.append(self.classify(i))
+            results.append(self.classify(i, laplaceSmooth=False))
+            print(results[i])
 
         accuracy = 0.0
         precision = 0.0
@@ -159,7 +197,7 @@ class NaiveBayes:
 
     def laplace(self):
         laplace = {}
-        for i in range(-30, 31):
+        for i in range(-30, -29):
             print(float('1e%d' % i))
             # uncomment this one before submit
             # for j in range(dataparser.folds):
@@ -177,6 +215,6 @@ class NaiveBayes:
 
 if __name__ == '__main__':
     classifier = NaiveBayes()
-    # classifier.preCalc()
+    classifier.preCalc()
     # classifier.crossClassify()
     classifier.laplace()
