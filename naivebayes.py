@@ -137,7 +137,6 @@ class NaiveBayes:
         results = []
         for i in range(dataparser.folds):
             # trainSeti.data as vertification set
-            # self.calcPro(i)
             results.append(self.classify(i))
 
         accuracy = 0.0
@@ -154,15 +153,18 @@ class NaiveBayes:
         print('Recall', float(recall) / dataparser.folds)
         print('F1-Measure', float(f1_measure) / dataparser.folds)
 
+    def preCalc(self):
+        for i in range(dataparser.folds):
+            self.calcPro(i)
+
     def laplace(self):
         laplace = {}
         results = []
         for i in range(-50, 51):
             print(float('1e%d' % i))
+            # uncomment this one before submit
             # for j in range(dataparser.folds):
             temp = i % 5
-                # uncomment this one before submit
-                # self.calcPro(i)
             results.append(self.classify(temp, laplaceSmooth=True, laplaceProb=float('1e%d' % i)))
             accuracy = 0.0
             precision = 0.0
@@ -181,5 +183,6 @@ class NaiveBayes:
 
 if __name__ == '__main__':
     classifier = NaiveBayes()
+    # classifier.preCalc()
     # classifier.crossClassify()
     classifier.laplace()
