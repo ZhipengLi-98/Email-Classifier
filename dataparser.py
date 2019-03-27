@@ -57,8 +57,8 @@ def crossValidation(folds):
     for i in range(folds):
         crossData.append([])
     for data in trainData:
-        temp = random.randint(1, 5)
-        crossData[temp % 5].append(data[0] + ' ' + data[1] + '\n')
+        temp = random.randint(1, folds)
+        crossData[temp % folds].append(data[0] + ' ' + data[1] + '\n')
 
     for i in range(folds):
         trainFile = open(dirPath + '/trainSet' + str(i) + '.data', 'w')
