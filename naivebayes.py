@@ -42,7 +42,7 @@ class NaiveBayes:
 
             # [\u4e00-\u9fa5]
             # 单个字符 是不是使用分词结果更好一些？
-            pattern = '[\u4e00-\u9fa5]'
+            pattern = '[\u4e00-\u9fa5]+'
             characters = re.findall(re.compile(pattern), content)
             for character in characters:
                 if character in self.features[label].keys():
@@ -89,7 +89,7 @@ class NaiveBayes:
             label = data[1]
             email = open(dataparser.dirPath + '/data_cut/' + emailPath[8:], encoding='utf-8')
             content = email.read()
-            pattern = '[\u4e00-\u9fa5]'
+            pattern = '[\u4e00-\u9fa5]+'
             characters = re.findall(re.compile(pattern), content)
             temp = 'ham'
             for character in characters:
@@ -159,22 +159,16 @@ class NaiveBayes:
 
     def laplace(self):
         laplace = {}
-        results = []
-        for i in range(-50, 51):
+        for i in range(-30, 31):
             print(float('1e%d' % i))
             # uncomment this one before submit
             # for j in range(dataparser.folds):
-            temp = i % 5
-            results.append(self.classify(temp, laplaceSmooth=True, laplaceProb=float('1e%d' % i)))
-            accuracy = 0.0
-            precision = 0.0
-            recall = 0.0
-            f1_measure = 0.0
-            for j in range(len(results)):
-                accuracy += results[j][0]
-                precision += results[j][1]
-                recall += results[j][2]
-                f1_measure += results[j][3]
+            # temp = i % 5
+            results = self.classify(0, laplaceSmooth=True, laplaceProb=float('1e%d' % i))
+            accuracy = results[0]
+            precision = results[1]
+            recall = results[2]
+            f1_measure = results[3]
             laplace[i] = [accuracy, precision, recall, f1_measure]
 
         file = open(dataparser.dirPath + '/' + 'laplace.result', 'w')
