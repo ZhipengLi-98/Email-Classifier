@@ -64,7 +64,7 @@ class NaiveBayes:
 
         print('Calc Fold ' + str(fold) + ' Done')
 
-    def classify(self, fold):
+    def classify(self, fold, laplaceSmooth=False, laplaceProb=1.0):
         print('Classify Fold ' + str(fold) + ' Start')
         # classify emails
         correctCnt = 0
@@ -96,11 +96,17 @@ class NaiveBayes:
                 # print(features[temp].keys())
                 if character in features[temp].keys():
                     hamProb += math.log(float(features[temp][character]) / float(probs[temp]))
+                else:
+                    if laplaceSmooth:
+                        hamProb += math.log(laplaceProb / (float(probs[temp]) + laplaceProb * len(characters)))
             temp = 'spam'
             for character in characters:
                 # print(features[temp].keys())
                 if character in features[temp].keys():
                     spamProb += math.log(float(features[temp][character]) / float(probs[temp]))
+                else:
+                    if laplaceSmooth:
+                        spamProb += math.log(laplaceProb / (float(probs[temp]) + laplaceProb * len(characters)))
 
             if spamProb > hamProb:
                 result = 'spam'
@@ -131,7 +137,7 @@ class NaiveBayes:
         results = []
         for i in range(dataparser.folds):
             # trainSeti.data as vertification set
-            self.calcPro(i)
+            # self.calcPro(i)
             results.append(self.classify(i))
 
         accuracy = 0.0
@@ -148,7 +154,32 @@ class NaiveBayes:
         print('Recall', float(recall) / dataparser.folds)
         print('F1-Measure', float(f1_measure) / dataparser.folds)
 
+    def laplace(self):
+        laplace = {}
+        results = []
+        for i in range(-50, 51):
+            print(float('1e%d' % i))
+            # for j in range(dataparser.folds):
+            temp = i % 5
+                # uncomment this one before submit
+                # self.calcPro(i)
+            results.append(self.classify(temp, laplaceSmooth=True, laplaceProb=float('1e%d' % i)))
+            accuracy = 0.0
+            precision = 0.0
+            recall = 0.0
+            f1_measure = 0.0
+            for j in range(len(results)):
+                accuracy += results[j][0]
+                precision += results[j][1]
+                recall += results[j][2]
+                f1_measure += results[j][3]
+            laplace[i] = [accuracy, precision, recall, f1_measure]
+
+        file = open(dataparser.dirPath + '/' + 'laplace.result', 'w')
+        json.dump(laplace, file, indent=4)
+
 
 if __name__ == '__main__':
     classifier = NaiveBayes()
-    classifier.crossClassify()
+    # classifier.crossClassify()
+    classifier.laplace()
