@@ -43,3 +43,31 @@ Use log() to avoid float error
 - Recall 0.9391662149431225
 
 - F1-Measure 0.9465109965319547
+
+### v3.x
+
+Use Laplace Smooth
+
+### v4.x
+
+Use words but characters
+
+- Accuracy:  0.7836013183014405
+
+- Precision 0.8541394322685841
+
+- Recall 0.8124992760644929
+
+- F1-Measure 0.8327877901173502
+
+### v5.x
+
+Add From, url and X-Mailer features
+
+- Accuracy 0.9969100038624952
+
+- Precision 0.9974415629724387
+
+- Recall 0.9979057591623036
+
+- F1-Measure 0.9976736070722345
