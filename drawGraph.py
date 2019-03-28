@@ -11,7 +11,8 @@ f1_measure = []
 
 
 def draw(data, comment):
-    plt.scatter(xAxis, data)
+    plt.plot(xAxis, data, marker='o')
+    plt.xlabel("Weight")
     plt.title(comment)
     plt.show()
 
@@ -24,9 +25,9 @@ if __name__ == '__main__':
     lastPr = 0.0
     lastRe = 0.0
     lastF1 = 0.0
-    for i in range(-30, 31):
+    for i in range(1, 20):
         result = data[str(i)]
-        xAxis.append(math.log(float('1e%d' % i)))
+        xAxis.append(i)
         accuracy.append(result[0])
         precision.append(result[1])
         recall.append(result[2])
@@ -35,17 +36,14 @@ if __name__ == '__main__':
         lastPr = result[1]
         lastRe = result[2]
         lastF1 = result[3]
-
+    '''
     draw(accuracy, "Accuracy")
     draw(precision, "Precision")
     draw(recall, "Recall")
     draw(f1_measure, "F1-Measure")
     '''
-    plt.plot([0.1, 1, 5, 50, 100], [0.7692, 0.9019, 0.9343, 0.9439, 0.9448], color="orange", label="Min", marker='o')
-    plt.plot([0.1, 1, 5, 50, 100], [0.8866, 0.9518, 0.9545, 0.9485, 0.9481], color="yellow", label="Max", marker='o')
-    plt.plot([0.1, 1, 5, 50, 100], [0.8468, 0.9253, 0.9436, 0.9460, 0.9467], color="red", label="Ave", marker='o')
-    plt.title("F1-Measure")
-    plt.xticks([0.1, 1, 5, 50, 100])
+    plt.plot(["Baseline", "Numercial Calc Optimize", "Words + Laplace", "Other Optimize"], [0.3095, 0.9465, 0.9941, 0.9990], marker='o')
+    # plt.bar(["Baseline", "Numercial Calc Optimize", "Words + Laplace", "Other Optimize"], [0.4550, 0.9682, 0.9540, 0.9983], width=0.5)
+    plt.title("Compare F1-Measure")
     plt.legend()
     plt.show()
-    '''
