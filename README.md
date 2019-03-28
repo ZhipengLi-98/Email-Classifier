@@ -71,3 +71,15 @@ Add From, url and X-Mailer features
 - Recall 0.9979057591623036
 
 - F1-Measure 0.9976736070722345
+
+### v6.x
+
+Add weight for features(weight = 12)
+
+- Accuracy 0.9987640015449981
+
+- Precision 0.998373416986174
+
+- Recall 0.9997673065735893
+
+- F1-Measure 0.9990698755958609
