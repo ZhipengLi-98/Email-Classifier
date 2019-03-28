@@ -78,7 +78,7 @@ class NaiveBayes:
 
         print('Calc Fold ' + str(fold) + ' Done')
 
-    def classify(self, fold, laplaceSmooth=False, laplaceProb=1.0):
+    def classify(self, fold, laplaceSmooth=False, laplaceProb=1.0, weight=1):
         print('Classify Fold ' + str(fold) + ' Start')
         # classify emails
         correctCnt = 0
@@ -117,16 +117,19 @@ class NaiveBayes:
             fromFeat = re.findall(re.compile(pattern), content)
             if not len(fromFeat) == 0:
                 sender = fromFeat[0].split("@")[-1].split(">")[0].split(" ")[0]
-                characters.append(sender)
+                for i in range(weight):
+                    characters.append(sender)
             pattern = 'http'
             url = re.findall(re.compile(pattern), content)
-            characters += url
+            for i in range(weight):
+                characters += url
 
             pattern = 'X-Mailer: .*'
             mailer = re.findall(re.compile(pattern), content)
             if not len(mailer) == 0:
                 xmailer = mailer[0].split(":")[1].split(" ")[1]
-                characters += xmailer
+                for i in range(weight):
+                    characters += xmailer
 
             temp = 'ham'
             for character in characters:
@@ -197,12 +200,12 @@ class NaiveBayes:
 
     def laplace(self):
         laplace = {}
-        for i in range(-30, -29):
+        for i in range(1, 20):
             print(float('1e%d' % i))
             # uncomment this one before submit
             # for j in range(dataparser.folds):
             # temp = i % 5
-            results = self.classify(0, laplaceSmooth=True, laplaceProb=float('1e%d' % i))
+            results = self.classify(0, laplaceSmooth=True, laplaceProb=float('1e%d' % (-30)), weight=i)
             accuracy = results[0]
             precision = results[1]
             recall = results[2]
@@ -215,6 +218,6 @@ class NaiveBayes:
 
 if __name__ == '__main__':
     classifier = NaiveBayes()
-    classifier.preCalc()
+    # classifier.preCalc()
     # classifier.crossClassify()
     classifier.laplace()
